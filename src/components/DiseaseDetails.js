@@ -4,12 +4,19 @@ import {
   Button,
   Image,
   View,
-  Text,
+  TouchableOpacity,
   Dimensions,
   StyleSheet,
+  ScrollView,
   ActivityIndicator,
 } from 'react-native';
+import HTML from 'react-native-render-html';
 import {base_url} from '../constants/Constant';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 const BannerWidth = Dimensions.get('window').width;
 const BannerHeight = 800;
@@ -54,6 +61,22 @@ class DiseaseDetails extends Component {
     );
   }
 
+  renderItem(item) {
+    return (
+      <ScrollView>
+        <View>
+          <HTML
+            tagsStyles={{
+              p: {fontSize: 10},
+              font: {color: '#C99700'},
+            }}
+            html={item}
+          />
+        </View>
+      </ScrollView>
+    );
+  }
+
   render() {
     const navigation = this.props.navigation;
     let {items} = this.state;
@@ -77,30 +100,45 @@ class DiseaseDetails extends Component {
               this.renderPage(image, index),
             )}
           </Carousel>
-        </View>
-        <View style={{flex: 0.8, justifyContent: 'center'}}>
-          <Text
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
             style={{
-              flex: 0.5,
-              textAlignVertical: 'center',
-              fontSize: 18,
-              paddingLeft: 5,
+              position: 'relative',
+              bottom: hp('36%'),
+              left: wp('90%'),
             }}>
-            {this.props.route.params.data.name}
-          </Text>
-          <Text
+            <Icon name="close" size={30} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity
             style={{
-              flex: 0.3,
-              textAlignVertical: 'center',
-              fontSize: 18,
-              color: '#997615',
-              paddingLeft: 5,
-            }}>
-            {this.state.items.name}
-          </Text>
+              position: 'relative',
+              bottom: hp('7%'),
+              left: wp('85%'),
+              right: wp('2%'),
+              borderRadius: 50,
+              width: 50,
+              height: 50,
+              backgroundColor: '#354A5E',
+            }}
+            onPress={() =>
+              this.props.navigation.navigate('Carousel', {
+                images: this.state.images,
+              })
+            }>
+            <Icon
+              style={{
+                position: 'absolute',
+                left: wp('3.5%'),
+                top: hp('2%'),
+              }}
+              name="image"
+              size={20}
+              color="white"
+            />
+          </TouchableOpacity>
         </View>
-        <View style={{flex: 2}}>
-          <Text>{this.state.items.content}</Text>
+        <View style={{flex: 3}}>
+          {this.renderItem(this.state.items.content)}
         </View>
         <Button title="Back" onPress={() => navigation.goBack()} />
       </View>
