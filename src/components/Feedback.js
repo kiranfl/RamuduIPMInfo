@@ -5,44 +5,59 @@ import {
   View,
   PanResponder,
   Animated,
+  TextInput,
   TouchableOpacity,
 } from 'react-native';
 import Header from './Header';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 const REACTIONS = [
   {
     label: 'Terrible',
+    rating: 1,
     src: require('../assets/img/worried.png'),
     bigSrc: require('../assets/img/worried_big.png'),
   },
   {
     label: 'Bad',
+    rating: 2,
     src: require('../assets/img/sad.png'),
     bigSrc: require('../assets/img/sad_big.png'),
   },
   {
     label: 'Okay',
+    rating: 3,
     src: require('../assets/img/ambitious.png'),
     bigSrc: require('../assets/img/ambitious_big.png'),
   },
   {
     label: 'Good',
+    rating: 4,
     src: require('../assets/img/smile.png'),
     bigSrc: require('../assets/img/smile_big.png'),
   },
   {
     label: 'Great',
+    rating: 5,
     src: require('../assets/img/surprised.png'),
     bigSrc: require('../assets/img/surprised_big.png'),
   },
 ];
-const WIDTH = 320;
+const WIDTH = 380;
 const DISTANCE = WIDTH / REACTIONS.length;
 const END = WIDTH - DISTANCE;
 
 export default class Feedback extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      rating: '0',
+      email: '',
+      Comments: '',
+    };
     this._pan = new Animated.Value(2 * DISTANCE);
   }
 
@@ -77,8 +92,34 @@ export default class Feedback extends React.Component {
     });
   }
 
-  updatePan(toValue) {
+  updatePan(toValue, reaction) {
     Animated.spring(this._pan, {toValue, friction: 7}).start();
+    this.setState({rating: reaction.rating});
+  }
+
+  submitFeedback() {
+    this.setState({isLoaded: true});
+    const url = 'http://23.20.169.44/api/feedbacks';
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        rating: this.state.rating,
+        email: this.state.email,
+        comments: this.state.comments,
+      }),
+    })
+      .then(response => response.json())
+      .then(responsejson => {
+        // eslint-disable-next-line no-alert
+        alert('Feed back submitted successfully');
+        this.props.navigation.navigate('Farm Crops');
+      })
+      .catch(error => {});
+    this.setState({isLoaded: false});
   }
 
   render() {
@@ -98,9 +139,40 @@ export default class Feedback extends React.Component {
             Give your Feedback
           </Text>
         </View>
-        <View style={{flex: 3, justifyContent: 'center'}} />
-        <View style={{flex: 3, justifyContent: 'center'}} />
-        <View style={{flex: 2, justifyContent: 'center'}} />
+        <View
+          style={{
+            flex: 2,
+            textAlignVertical: 'center',
+            justifyContent: 'center',
+          }}>
+          <TextInput
+            placeholder="Enter Email"
+            style={{
+              width: wp('90%'),
+              borderBottomColor: 'gray',
+              borderBottomWidth: 2,
+            }}
+            onChangeText={email => this.setState({email})}
+            value={this.state.email}
+          />
+        </View>
+        <View
+          style={{
+            flex: 2,
+            textAlignVertical: 'center',
+            justifyContent: 'center',
+          }}>
+          <TextInput
+            placeholder="Enter Comments"
+            style={{
+              width: wp('90%'),
+              borderBottomColor: 'gray',
+              borderBottomWidth: 2,
+            }}
+            onChangeText={comments => this.setState({comments})}
+            value={this.state.comments}
+          />
+        </View>
         <View style={styles.wrap}>
           <View style={styles.reactions}>
             {REACTIONS.map((reaction, idx) => {
@@ -126,7 +198,7 @@ export default class Feedback extends React.Component {
 
               return (
                 <TouchableOpacity
-                  onPress={() => this.updatePan(u)}
+                  onPress={() => this.updatePan(u, reaction)}
                   activeOpacity={0.9}
                   key={idx}>
                   <View style={styles.smileyWrap}>
@@ -223,6 +295,47 @@ export default class Feedback extends React.Component {
             </Animated.View>
           </View>
         </View>
+        <View
+          style={{
+            flex: 1.2,
+            flexDirection: 'row',
+            borderTopColor: 'gray',
+            borderTopWidth: 0.3,
+          }}>
+          <TouchableOpacity style={{flex: 10, alignItems: 'center'}}>
+            <View>
+              <Text
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  textAlign: 'center',
+                  fontWeight: 'Bold',
+                  fontSize: hp('3%'),
+                }}
+              />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => this.submitFeedback()}
+            style={{
+              borderLeftWidth: 0.3,
+              borderLeftColor: 'gray',
+              flex: 4,
+              justifyContent: 'center',
+            }}>
+            <View>
+              <Text
+                style={{
+                  alignItems: 'center',
+                  textAlign: 'center',
+                  fontWeight: 'Bold',
+                  fontSize: hp('2.5%'),
+                }}>
+                Submit
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -238,7 +351,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   wrap: {
-    flex: 10,
+    flex: 6,
+    marginTop: hp('10%'),
     width: WIDTH,
   },
   reactions: {

@@ -11,13 +11,19 @@ import PestNews from '../components/PestNews';
 import Videos from '../components/Videos';
 import StrawberriesVegetables from '../components/StrawberriesVegetables';
 import Feedback from '../components/Feedback';
+import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
 
 function CustomDrawerContent(props) {
   return (
     <DrawerContentScrollView {...props}>
       <DrawerItem
         label="IPMInfo"
-        style={{backgroundColor: '#997615', height: 60}}
+        style={{
+          backgroundColor: '#997615',
+          width: wp('100%'),
+          marginLeft: 0,
+          marginTop: -5,
+        }}
         labelStyle={{
           textAlignVertical: 'center',
           color: '#fff',
@@ -50,12 +56,6 @@ function Main() {
       />
       <Drawer.Screen name="Videos" component={Videos} />
       <Drawer.Screen name="Feedback" component={Feedback} />
-      <Drawer.Screen name="Discover" component={HomePage} />
-      <Drawer.Screen name="Meeting Handouts" component={HomePage} />
-      <Drawer.Screen name="Meeting Presentations" component={HomePage} />
-      <Drawer.Screen name="About Us" component={HomePage} />
-      <Drawer.Screen name="Notifications" component={HomePage} />
-      <Drawer.Screen name="Preferences" component={HomePage} />
     </Drawer.Navigator>
   );
 }

@@ -6,10 +6,12 @@ import {
   FlatList,
   ActivityIndicator,
   Text,
+  Linking,
 } from 'react-native';
-import Video from 'react-native-video';
+import {WebView} from 'react-native-webview';
 import Header from './Header';
 import {api} from '../constants/Constant';
+import {heightPercentageToDP} from 'react-native-responsive-screen';
 
 class Videos extends Component {
   constructor(props) {
@@ -40,12 +42,22 @@ class Videos extends Component {
   renderItem = ({item, index}) => {
     return (
       <TouchableOpacity style={styles.card}>
-        <Video
-          source={{uri: item.url}}
-          ref={ref => {
-            this.player = ref;
+        <WebView
+          style={{
+            flex: 4,
+            overflow: 'visible',
+            height: heightPercentageToDP('15%'),
           }}
-          style={styles.cardImg}
+          ref={ref => {
+            this.webview = ref;
+          }}
+          source={{uri: item.url}}
+          onNavigationStateChange={event => {
+            if (event.url !== item.url) {
+              this.webview.stopLoading();
+              Linking.openURL(event.url);
+            }
+          }}
         />
         <Text style={styles.cardText}>{item.article}</Text>
       </TouchableOpacity>
@@ -107,16 +119,10 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   cardText: {
-    flex: 8,
+    flex: 2,
     fontSize: 16,
     padding: 10,
     textAlignVertical: 'center',
-  },
-  cardImg: {
-    flex: 3,
-    width: '100%',
-    height: 100,
-    resizeMode: 'cover',
   },
   loader: {
     flex: 1,

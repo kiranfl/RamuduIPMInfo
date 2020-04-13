@@ -28,7 +28,7 @@ class SplashScreen extends Component {
       Animated.timing(LogoText, {
         toValue: 1,
         duration: 3000,
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
     ]).start(() => {
       this.setState({

@@ -1,5 +1,12 @@
 import * as React from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  ImageBackground,
+} from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -18,6 +25,7 @@ class Home extends React.Component {
       originalName: '',
       description: '',
       id: '',
+      img: null,
     };
   }
   componentDidMount() {
@@ -30,6 +38,10 @@ class Home extends React.Component {
       .then(responsejson => {
         this.setState({
           data: responsejson,
+          name: responsejson[0].name,
+          originalName: responsejson[0].scientificName,
+          img: responsejson[0].image,
+          description: responsejson[0].description,
         });
       })
       .catch(error => {});
@@ -38,6 +50,7 @@ class Home extends React.Component {
   getCrops = index => {
     this.setState({
       name: this.state.data[index].name,
+      img: this.state.data[index].image,
       originalName: this.state.data[index].scientificName,
       description: this.state.data[index].description,
       id: this.state.data[index].id,
@@ -46,19 +59,9 @@ class Home extends React.Component {
   renderItem = ({item}) => {
     return (
       <View style={{flex: 1, justifyContent: 'center'}}>
-        <Text
-          style={{
-            textTransform: 'uppercase',
-            fontSize: 25,
-            textAlign: 'center',
-            fontWeight: 'bold',
-            marginBottom: 15,
-          }}>
-          {item.name}
-        </Text>
         <Image
           source={{uri: item.image}}
-          style={{width: 200, height: 280, borderRadius: 20}}
+          style={{width: 200, height: 260, borderRadius: 20}}
         />
       </View>
     );
@@ -68,79 +71,64 @@ class Home extends React.Component {
     return (
       <SafeAreaView style={styles.container}>
         <View
-          style={{flex: 10, justifyContent: 'center', flexDirection: 'column'}}>
-          <View style={{flex: 6}}>
-            <Carousel
-              ref={ref => (this.carousel = ref)}
-              firstItem={1}
-              sliderWidth={1000}
-              itemWidth={500 / 2.5}
-              height={250}
-              data={this.state.data}
-              renderItem={this.renderItem}
-              onSnapToItem={index => this.getCrops(index)}
-              onBeforeSnapToItem={index => this.getCrops(index)}
-              containerCustomStyle={{overflow: 'visible'}}
-              contentContainerCustomStyle={{overflow: 'visible'}}
-              enableMomentum={true}
-            />
-          </View>
-          <View style={{flex: 3, alignItems: 'center', padding: 20}}>
-            <Text style={{marginTop: 5, fontSize: 24, padding: 5}}>
-              {this.state.originalName}
-            </Text>
-            <Text style={{textAlign: 'center', width: wp('50%')}}>
-              {this.state.description}
-            </Text>
-          </View>
-        </View>
-        <View
           style={{
-            flex: 1,
-            flexDirection: 'row',
-            borderTopColor: 'gray',
-            borderTopWidth: 0.6,
-            backgroundColor: 'white',
+            flex: 6,
+            marginTop: 15,
+            justifyContent: 'center',
+            flexDirection: 'column',
           }}>
-          <TouchableOpacity style={{flex: 2, alignItems: 'center'}} />
-          <TouchableOpacity
-            onPress={() =>
-              this.props.navigation.navigate('MoreDetails', {
-                data: {id: this.state.id},
-              })
-            }
-            style={{flex: 6, alignItems: 'center'}}>
-            <View>
-              <Text
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  fontWeight: 'Bold',
-                  fontSize: hp('3%'),
-                  marginTop: hp('2%'),
-                }}>
-                More details
-              </Text>
+          <Text
+            style={{
+              textTransform: 'uppercase',
+              fontSize: 25,
+              textAlign: 'center',
+              fontWeight: 'bold',
+              marginBottom: 15,
+            }}>
+            {this.state.name}
+          </Text>
+          <Carousel
+            ref={ref => (this.carousel = ref)}
+            firstItem={1}
+            sliderWidth={wp('100%')}
+            itemWidth={200}
+            data={this.state.data}
+            renderItem={this.renderItem}
+            onSnapToItem={index => this.getCrops(index)}
+            onBeforeSnapToItem={index => this.getCrops(index)}
+            containerCustomStyle={{overflow: 'visible'}}
+            contentContainerCustomStyle={{overflow: 'visible'}}
+            enableMomentum={true}
+          />
+        </View>
+        <View style={{flex: 1.5, alignItems: 'center', padding: 20}}>
+          <Text style={{marginTop: 5, fontSize: 24, padding: 5}}>
+            {this.state.originalName}
+          </Text>
+          <Text style={{textAlign: 'center', width: wp('90%')}}>
+            {this.state.description}
+          </Text>
+        </View>
+        <View style={{flex: 4, justifyContent: 'center'}}>
+          <ImageBackground
+            source={{uri: this.state.img}}
+            style={styles.imagePreview}>
+            <View style={styles.footer}>
+              <TouchableOpacity
+                onPress={() =>
+                  this.props.navigation.navigate('MoreDetails', {
+                    data: {id: this.state.id},
+                  })
+                }>
+                <View>
+                  <Text style={styles.moredetails}>More details</Text>
+                </View>
+                <View style={styles.icon}>
+                  <Icon size={18} name="chevron-right" color="white" />
+                </View>
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={{flex: 2, alignItems: 'center'}}>
-            <View style={{marginTop: 20, alignSelf: 'flex-end'}}>
-              <View
-                style={{
-                  width: 30,
-                  padding: 5,
-                  paddingLeft: 8,
-                  height: 30,
-                  borderWidth: 1,
-                  borderRadius: 50,
-                  backgroundColor: 'gray',
-                  borderColor: 'gray',
-                }}>
-                <Icon size={20} name="chevron-right" color="white" />
-              </View>
-            </View>
-          </TouchableOpacity>
+          </ImageBackground>
         </View>
       </SafeAreaView>
     );
@@ -149,6 +137,42 @@ class Home extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imagePreview: {
+    justifyContent: 'center',
+    width: wp('100%'),
+    height: hp('30%'),
+    opacity: 0.7,
+  },
+  footer: {
+    position: 'relative',
+    width: wp('100%'),
+    height: hp('8%'),
+    top: 85,
+    bottom: 0,
+    paddingTop: wp('3.3%'),
+    backgroundColor: 'white',
+  },
+  moredetails: {
+    textAlign: 'center',
+    fontSize: hp('3%'),
+  },
+  icon: {
+    position: 'absolute',
+    width: 30,
+    top: 0,
+    right: 8,
+    height: 30,
+    borderRadius: 50,
+    paddingLeft: 10,
+    paddingTop: 6,
+    backgroundColor: 'gray',
+    borderColor: 'gray',
+  },
+  loader: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
