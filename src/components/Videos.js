@@ -6,18 +6,18 @@ import {
   FlatList,
   ActivityIndicator,
   Text,
+  Image,
   Linking,
 } from 'react-native';
-import {WebView} from 'react-native-webview';
+import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import Header from './Header';
 import {api} from '../constants/Constant';
-import {heightPercentageToDP} from 'react-native-responsive-screen';
-
 class Videos extends Component {
   constructor(props) {
     super(props);
     this.state = {
       items: [],
+      name: '',
     };
   }
 
@@ -33,32 +33,23 @@ class Videos extends Component {
       .then(responsejson => {
         this.setState({
           items: responsejson.value,
+          name: responsejson.name,
         });
       })
       .catch(error => {});
     this.setState({isLoaded: false});
   }
 
+  imageUrl = item => {
+    const vid = item.split('?v=');
+    return `https://img.youtube.com/vi/${vid[1]}/default.jpg`;
+  };
   renderItem = ({item, index}) => {
     return (
-      <TouchableOpacity style={styles.card}>
-        <WebView
-          style={{
-            flex: 4,
-            overflow: 'visible',
-            height: heightPercentageToDP('15%'),
-          }}
-          ref={ref => {
-            this.webview = ref;
-          }}
-          source={{uri: item.url}}
-          onNavigationStateChange={event => {
-            if (event.url !== item.url) {
-              this.webview.stopLoading();
-              Linking.openURL(event.url);
-            }
-          }}
-        />
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => Linking.openURL(item.url)}>
+        <Image style={styles.cardImg} source={{uri: this.imageUrl(item.url)}} />
         <Text style={styles.cardText}>{item.article}</Text>
       </TouchableOpacity>
     );
@@ -78,7 +69,7 @@ class Videos extends Component {
         <Header navigation={navigation} />
         <View
           style={{flex: 0.1, justifyContent: 'center', alignItems: 'center'}}>
-          <Text style={{fontSize: 25, fontWeight: 'bold'}}>Videos</Text>
+          <Text style={styles.title}>{this.state.name}</Text>
         </View>
         <FlatList
           style={styles.List}
@@ -102,12 +93,19 @@ const styles = StyleSheet.create({
   List: {
     flex: 1,
   },
+  title: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    textTransform: 'capitalize',
+  },
   card: {
     flex: 1,
+    height: hp('15%'),
     flexDirection: 'row',
     backgroundColor: '#ffffff',
     marginBottom: 5,
     marginLeft: '2%',
+    borderRadius: 2,
     width: '96%',
     shadowColor: '#000',
     shadowOffset: {
@@ -118,8 +116,13 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
     elevation: 10,
   },
+  cardImg: {
+    flex: 4,
+    width: '100%',
+    resizeMode: 'cover',
+  },
   cardText: {
-    flex: 2,
+    flex: 8,
     fontSize: 16,
     padding: 10,
     textAlignVertical: 'center',

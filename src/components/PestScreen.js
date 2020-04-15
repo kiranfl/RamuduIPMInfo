@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     marginBottom: 5,
     marginLeft: '2%',
+    borderRadius: 2,
     width: '96%',
     shadowColor: '#000',
     shadowOffset: {

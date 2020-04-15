@@ -92,6 +92,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#ffffff',
     marginBottom: 5,
+    borderRadius: 2,
     marginLeft: '2%',
     width: '96%',
     shadowColor: '#000',

@@ -6,7 +6,9 @@ import {
   FlatList,
   ActivityIndicator,
   Text,
+  Linking,
 } from 'react-native';
+import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import Header from './Header';
 import {api} from '../constants/Constant';
 
@@ -36,7 +38,9 @@ class PestNews extends Component {
 
   renderItem = ({item, index}) => {
     return (
-      <TouchableOpacity style={styles.card}>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => Linking.openURL(item.url)}>
         <Text style={styles.cardText}>{item.article}</Text>
       </TouchableOpacity>
     );
@@ -90,9 +94,11 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     flexDirection: 'row',
+    height: hp('15%'),
     backgroundColor: '#ffffff',
     marginBottom: 5,
     marginLeft: '2%',
+    borderRadius: 2,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

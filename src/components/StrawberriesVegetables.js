@@ -6,8 +6,10 @@ import {
   FlatList,
   ActivityIndicator,
   Text,
+  Linking,
 } from 'react-native';
 import Header from './Header';
+import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import {api} from '../constants/Constant';
 
 class starwberryVegetable extends Component {
@@ -36,7 +38,9 @@ class starwberryVegetable extends Component {
 
   renderItem = ({item, index}) => {
     return (
-      <TouchableOpacity style={styles.card}>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => Linking.openURL(item.url)}>
         <Text style={styles.cardText}>{item.article}</Text>
       </TouchableOpacity>
     );
@@ -88,7 +92,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   card: {
+    borderRadius: 2,
     flex: 1,
+    height: hp('15%'),
     flexDirection: 'row',
     backgroundColor: '#ffffff',
     marginBottom: 5,
