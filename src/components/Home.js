@@ -11,11 +11,11 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import {fetchCropsDetails} from '../store/actions/actions';
+import {connect} from 'react-redux';
 import Carousel from 'react-native-snap-carousel';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {base_url} from '../constants/Constant';
-
 class Home extends React.Component {
   constructor() {
     super();
@@ -28,33 +28,36 @@ class Home extends React.Component {
       img: null,
     };
   }
-  componentDidMount() {
-    this.getCropDetails();
-  }
-  getCropDetails = () => {
-    const url = `${base_url}/crops`;
-    fetch(url)
-      .then(response => response.json())
-      .then(responsejson => {
-        this.setState({
-          data: responsejson,
-          name: responsejson[0].name,
-          originalName: responsejson[0].scientificName,
-          img: responsejson[0].image,
-          description: responsejson[0].description,
-        });
-      })
-      .catch(error => {});
+
+  componentDidMount = async () => {
+    await this.props.redFuncfetchCropsData();
   };
 
-  getCrops = index => {
-    this.setState({
-      name: this.state.data[index].name,
-      img: this.state.data[index].image,
-      originalName: this.state.data[index].scientificName,
-      description: this.state.data[index].description,
-      id: this.state.data[index].id,
-    });
+  componentWillReceiveProps = nextProps => {
+    const {cropsList} = nextProps.reducer;
+    if (cropsList !== undefined && cropsList.length > 0) {
+      this.setState({
+        name: cropsList[0].name,
+        originalName: cropsList[0].scientificName,
+        description: cropsList[0].description,
+        id: cropsList[0].id,
+        img: cropsList[0].image,
+      });
+    }
+  };
+
+  getCrops = async index => {
+    const {cropsList} = this.props.reducer;
+    this.setState(
+      {
+        name: cropsList[index].name,
+        originalName: cropsList[index].scientificName,
+        description: cropsList[index].description,
+        id: cropsList[index].id,
+        img: cropsList[index].image,
+      },
+      function() {},
+    );
   };
   renderItem = ({item}) => {
     return (
@@ -68,6 +71,7 @@ class Home extends React.Component {
   };
 
   render() {
+    const {cropsList} = this.props.reducer;
     return (
       <SafeAreaView style={styles.container}>
         <View
@@ -92,7 +96,7 @@ class Home extends React.Component {
             firstItem={1}
             sliderWidth={wp('100%')}
             itemWidth={200}
-            data={this.state.data}
+            data={cropsList}
             renderItem={this.renderItem}
             onSnapToItem={index => this.getCrops(index)}
             onBeforeSnapToItem={index => this.getCrops(index)}
@@ -179,4 +183,15 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home;
+const mapStateToProps = state => ({
+  reducer: state,
+});
+
+const mapDispatchToProps = {
+  redFuncfetchCropsData: fetchCropsDetails,
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Home);

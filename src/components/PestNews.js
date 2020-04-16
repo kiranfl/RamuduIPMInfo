@@ -10,30 +10,41 @@ import {
 } from 'react-native';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import Header from './Header';
-import {api} from '../constants/Constant';
-
+import {fetchPestsNews} from '../store/actions/actions';
+import {connect} from 'react-redux';
 class PestNews extends Component {
   constructor(props) {
     super(props);
     this.state = {
       items: [],
       title: '',
+      refreshing: false,
     };
   }
 
-  componentDidMount = () => {
-    this.setState({isLoaded: true});
-    const url = `${api}/pest-news`;
-    fetch(url)
-      .then(response => response.json())
-      .then(responsejson => {
-        this.setState({
-          items: responsejson.value,
-          title: responsejson.name,
-        });
-      })
-      .catch(error => {});
-    this.setState({isLoaded: false});
+  componentDidMount = async () => {
+    this.makeNewRequest();
+  };
+
+  makeNewRequest = async () => {
+    await this.props.fetchPestsNews();
+    const {PestsNews} = this.props.reducer;
+    this.setState({
+      items: PestsNews.value,
+      title: PestsNews.name,
+      refreshing: false,
+    });
+  };
+
+  handleRefresh = () => {
+    this.setState(
+      {
+        refreshing: true,
+      },
+      () => {
+        this.makeNewRequest();
+      },
+    );
   };
 
   renderItem = ({item, index}) => {
@@ -75,13 +86,13 @@ class PestNews extends Component {
           data={items}
           keyExtractor={(item, index) => index.toString()}
           renderItem={this.renderItem}
+          refreshing={this.state.refreshing}
+          onRefresh={this.handleRefresh}
         />
       </View>
     );
   }
 }
-
-export default PestNews;
 
 const styles = StyleSheet.create({
   container: {
@@ -124,3 +135,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+const mapStateToProps = state => ({
+  reducer: state,
+});
+
+export default connect(
+  mapStateToProps,
+  {fetchPestsNews},
+)(PestNews);

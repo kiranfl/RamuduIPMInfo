@@ -11,39 +11,48 @@ import {
 } from 'react-native';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import Header from './Header';
-import {api} from '../constants/Constant';
+import {fetchVideos} from '../store/actions/actions';
+import {connect} from 'react-redux';
 class Videos extends Component {
   constructor(props) {
     super(props);
     this.state = {
       items: [],
       name: '',
+      refreshing: false,
     };
   }
 
-  componentDidMount() {
-    this.getVideos();
-  }
+  componentDidMount = async () => {
+    this.makeNewRequest();
+  };
 
-  getVideos() {
-    this.setState({isLoaded: true});
-    const url = `${api}/videos`;
-    fetch(url)
-      .then(response => response.json())
-      .then(responsejson => {
-        this.setState({
-          items: responsejson.value,
-          name: responsejson.name,
-        });
-      })
-      .catch(error => {});
-    this.setState({isLoaded: false});
-  }
+  makeNewRequest = async () => {
+    await this.props.fetchVideos();
+    const {VideosList} = this.props.reducer;
+    this.setState({
+      items: VideosList.value,
+      name: VideosList.name,
+      refreshing: false,
+    });
+  };
+
+  handleRefresh = () => {
+    this.setState(
+      {
+        refreshing: true,
+      },
+      () => {
+        this.makeNewRequest();
+      },
+    );
+  };
 
   imageUrl = item => {
     const vid = item.split('?v=');
     return `https://img.youtube.com/vi/${vid[1]}/default.jpg`;
   };
+
   renderItem = ({item, index}) => {
     return (
       <TouchableOpacity
@@ -54,6 +63,7 @@ class Videos extends Component {
       </TouchableOpacity>
     );
   };
+
   render() {
     let {items} = this.state;
     if (items.length === 0) {
@@ -76,13 +86,13 @@ class Videos extends Component {
           data={items}
           keyExtractor={(item, index) => index.toString()}
           renderItem={this.renderItem}
+          refreshing={this.state.refreshing}
+          onRefresh={this.handleRefresh}
         />
       </View>
     );
   }
 }
-
-export default Videos;
 
 const styles = StyleSheet.create({
   container: {
@@ -133,3 +143,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+const mapStateToProps = state => ({
+  reducer: state,
+});
+
+export default connect(
+  mapStateToProps,
+  {fetchVideos},
+)(Videos);

@@ -1,0 +1,9 @@
+const URL = 'http://23.20.169.44/api';
+export const BASE_URL = `${URL}/en-us/`; //'http://23.20.169.44/api/en-us/';
+export const CROPS = `${BASE_URL}/crops`; // 'http://23.20.169.44/api/en-us/crops'
+export const CATEGORIES = 'categories';
+export const POSTS = `${BASE_URL}/posts`;
+export const VIDEOS = `${URL}/menu/videos`;
+export const FEEDBACKS = `${URL}/feedbacks`;
+export const STRAWBERRY_VEG_NEWS = `${URL}/menu/starwberry-veg-news`;
+export const PEST_NEWS = `${URL}/menu/pest-news`;

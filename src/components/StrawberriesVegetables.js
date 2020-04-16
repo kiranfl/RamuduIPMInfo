@@ -10,30 +10,41 @@ import {
 } from 'react-native';
 import Header from './Header';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import {api} from '../constants/Constant';
-
+import {connect} from 'react-redux';
+import {fetchStrawberryVegNews} from '../store/actions/actions';
 class starwberryVegetable extends Component {
   constructor(props) {
     super(props);
     this.state = {
       items: [],
       title: '',
+      refreshing: false,
     };
   }
 
-  componentDidMount = () => {
-    this.setState({isLoaded: true});
-    const url = `${api}/starwberry-veg-news`;
-    fetch(url)
-      .then(response => response.json())
-      .then(responsejson => {
-        this.setState({
-          items: responsejson.value,
-          title: responsejson.name,
-        });
-      })
-      .catch(error => {});
-    this.setState({isLoaded: false});
+  componentDidMount = async () => {
+    this.makeNewRequest();
+  };
+
+  makeNewRequest = async () => {
+    await this.props.fetchStrawberryVegNews();
+    const {StrawberryVegNews} = this.props.reducer;
+    this.setState({
+      items: StrawberryVegNews.value,
+      title: StrawberryVegNews.name,
+      refreshing: false,
+    });
+  };
+
+  handleRefresh = () => {
+    this.setState(
+      {
+        refreshing: true,
+      },
+      () => {
+        this.makeNewRequest();
+      },
+    );
   };
 
   renderItem = ({item, index}) => {
@@ -45,6 +56,7 @@ class starwberryVegetable extends Component {
       </TouchableOpacity>
     );
   };
+
   render() {
     let {items} = this.state;
     if (items.length === 0) {
@@ -75,13 +87,13 @@ class starwberryVegetable extends Component {
           data={items}
           keyExtractor={(item, index) => index.toString()}
           renderItem={this.renderItem}
+          refreshing={this.state.refreshing}
+          onRefresh={this.handleRefresh}
         />
       </View>
     );
   }
 }
-
-export default starwberryVegetable;
 
 const styles = StyleSheet.create({
   container: {
@@ -124,3 +136,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+const mapStateToProps = state => ({
+  reducer: state,
+});
+
+export default connect(
+  mapStateToProps,
+  {fetchStrawberryVegNews},
+)(starwberryVegetable);
