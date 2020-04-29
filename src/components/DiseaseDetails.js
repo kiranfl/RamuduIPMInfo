@@ -1,22 +1,20 @@
 import React, {Component} from 'react';
 import Carousel from 'react-native-banner-carousel';
 import {
-  Button,
   Image,
   View,
   TouchableOpacity,
   Dimensions,
   StyleSheet,
-  ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import HTML from 'react-native-render-html';
-import {base_url} from '../constants/Constant';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import WebView from 'react-native-webview';
+import Swiper from 'react-native-swiper';
 
 const BannerWidth = Dimensions.get('window').width;
 const BannerHeight = 800;
@@ -24,31 +22,20 @@ class DiseaseDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: {},
+      items: [],
       images: [],
     };
   }
 
-  componentDidMount() {
-    this.getDiseaseDetails();
-  }
-
-  getDiseaseDetails() {
-    this.setState({isLoaded: true});
-    const url = `${base_url}/posts/${
-      this.props.route.params.data.id
-    }?type=plain`;
-    fetch(url)
-      .then(response => response.json())
-      .then(responsejson => {
-        this.setState({
-          items: responsejson,
-          images: responsejson.images,
-        });
-      })
-      .catch(error => {});
-    this.setState({isLoaded: false});
-  }
+  componentDidMount = () => {
+    this.setState(
+      {
+        items: this.props.route.params,
+        images: this.props.route.params[0].images,
+      },
+      () => {},
+    );
+  };
 
   renderPage(image, index) {
     return (
@@ -61,21 +48,12 @@ class DiseaseDetails extends Component {
     );
   }
 
-  renderItem(item) {
-    return (
-      <ScrollView>
-        <View>
-          <HTML
-            tagsStyles={{
-              p: {fontSize: 10},
-              font: {color: '#C99700'},
-            }}
-            html={item}
-          />
-        </View>
-      </ScrollView>
-    );
-  }
+  pageChange = index => {
+    this.setState({
+      images: this.state.items[index].images,
+      activeSlide: 0,
+    });
+  };
 
   render() {
     const navigation = this.props.navigation;
@@ -118,6 +96,7 @@ class DiseaseDetails extends Component {
               borderRadius: 50,
               width: 50,
               height: 50,
+              zIndex: 999,
               backgroundColor: '#354A5E',
             }}
             onPress={() =>
@@ -130,6 +109,7 @@ class DiseaseDetails extends Component {
                 position: 'absolute',
                 left: wp('3.5%'),
                 top: hp('2%'),
+                bottom: hp('2%'),
               }}
               name="image"
               size={20}
@@ -138,9 +118,23 @@ class DiseaseDetails extends Component {
           </TouchableOpacity>
         </View>
         <View style={{flex: 3}}>
-          {this.renderItem(this.state.items.content)}
+          <Swiper
+            style={styles.wrapper}
+            showsButtons={false}
+            loop={false}
+            onIndexChanged={index => this.pageChange(index)}>
+            {this.state.items.map(val => {
+              return (
+                <View style={{flex: 1}}>
+                  <WebView
+                    originWhitelist={['*']}
+                    source={{html: val.content}}
+                  />
+                </View>
+              );
+            })}
+          </Swiper>
         </View>
-        <Button title="Back" onPress={() => navigation.goBack()} />
       </View>
     );
   }
@@ -153,5 +147,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  wrapper: {
+    position: 'relative',
   },
 });
