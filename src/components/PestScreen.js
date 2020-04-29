@@ -8,7 +8,9 @@ import {
   ActivityIndicator,
   Text,
 } from 'react-native';
-import {base_url} from '../constants/Constant';
+import {getPreviewDetails} from '../store/actions/actions';
+import {fetchPestDetails} from '../store/actions/actions';
+import {connect} from 'react-redux';
 
 class PestScreen extends Component {
   constructor(props) {
@@ -18,33 +20,31 @@ class PestScreen extends Component {
     };
   }
 
-  componentDidMount() {
-    this.getPestlist();
-  }
+  componentDidMount = async () => {
+    await this.props.redFuncfetchPestDetails(this.props.route.params.id);
+    const {pestsList} = this.props.reducer;
+    if (pestsList !== undefined && pestsList.length > 0) {
+      this.setState({
+        items: pestsList[1]._subCategories,
+      });
+    }
+  };
 
-  getPestlist() {
-    this.setState({isLoaded: true});
-    const url = `${base_url}/crops/${this.props.route.params.id}/categories`;
-    fetch(url)
-      .then(response => response.json())
-      .then(responsejson => {
-        this.setState({
-          items: responsejson[1]._subCategories,
-        });
-      })
-      .catch(error => {});
-    this.setState({isLoaded: false});
-  }
+  navigateToDetailsScreen = async item => {
+    const catposts = item._catposts;
+    const details = [];
+    for (let i = 0; i < catposts.length; i++) {
+      let getResult = await getPreviewDetails(catposts[i]._id);
+      details.push(getResult);
+    }
+    this.props.navigation.navigate('diseaseDetails', details);
+  };
 
   renderItem = ({item, index}) => {
     return (
       <TouchableOpacity
         style={styles.card}
-        onPress={() =>
-          this.props.navigation.navigate('diseaseDetails', {
-            data: {id: item._catposts[0]._id},
-          })
-        }>
+        onPress={() => this.navigateToDetailsScreen(item)}>
         <Image style={styles.cardImg} source={{uri: item.image}} />
         <Text style={styles.cardText}>{item.name}</Text>
       </TouchableOpacity>
@@ -75,8 +75,6 @@ class PestScreen extends Component {
     );
   }
 }
-
-export default PestScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -122,3 +120,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+const mapStateToProps = state => ({
+  reducer: state,
+});
+
+const mapDispatchToProps = {
+  redFuncfetchPestDetails: fetchPestDetails,
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(PestScreen);

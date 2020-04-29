@@ -1,5 +1,4 @@
 import {
-  BASE_URL,
   CROPS,
   CATEGORIES,
   POSTS,
@@ -49,11 +48,64 @@ export const fetchCropsDetailsSuccess = json => {
     payload: json,
   };
 };
+export const fetchDiseseDetailsSuccess = json => {
+  return {
+    type: ACTION_TYPES.GET_DISEASE_DETAILS_SUCCESS,
+    payload: json,
+  };
+};
+
+export const fetchPestDetailsSuccess = json => {
+  return {
+    type: ACTION_TYPES.GET_PEST_DETAILS_SUCCESS,
+    payload: json,
+  };
+};
+
+export const fetchPestDetails = cropId => {
+  return async dispatch => {
+    dispatch(fetchingInProgress());
+    return fetch(`${CROPS}/${cropId}/${CATEGORIES}`, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        return dispatch(fetchPestDetailsSuccess(responseJson));
+      })
+      .catch(function(error) {
+        dispatch(fetchingFailure(error));
+      });
+  };
+};
+
+export const fetchDiseaseDetails = cropId => {
+  return async dispatch => {
+    dispatch(fetchingInProgress());
+    return fetch(`${CROPS}/${cropId}/${CATEGORIES}`, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        return dispatch(fetchDiseseDetailsSuccess(responseJson));
+      })
+      .catch(function(error) {
+        dispatch(fetchingFailure(error));
+      });
+  };
+};
 
 export const fetchCropsDetails = () => {
   return async dispatch => {
     dispatch(fetchingInProgress());
-    return fetch('http://23.20.169.44/api/en-us/crops', {
+    return fetch(CROPS, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -135,3 +187,36 @@ export const fetchPestsNews = () => {
       });
   };
 };
+
+export const postFeedback = payload => {
+  fetch(FEEDBACKS, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+    .then(response => response.json())
+    .then(responsejson => {
+      this.props.navigation.navigate('Farm Crops');
+    })
+    .catch(error => {});
+};
+
+export function getPreviewDetails(id) {
+  return fetch(`${POSTS}/${id}?type=plain`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+  })
+    .then(response => response.json())
+    .then(responseJson => {
+      return responseJson;
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+}

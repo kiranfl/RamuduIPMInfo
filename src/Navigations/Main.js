@@ -11,7 +11,7 @@ import PestNews from '../components/PestNews';
 import Videos from '../components/Videos';
 import StrawberriesVegetables from '../components/StrawberriesVegetables';
 import Feedback from '../components/Feedback';
-import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 function CustomDrawerContent(props) {
   return (
@@ -20,9 +20,15 @@ function CustomDrawerContent(props) {
         label="IPMInfo"
         style={{
           backgroundColor: '#997615',
-          width: wp('100%'),
           marginLeft: 0,
-          marginTop: -5,
+          marginTop: -4,
+          paddingLeft: 0,
+          paddingRight: 0,
+          marginRight: 0,
+          paddingTop: 0,
+          paddingBottom: 0,
+          marginBottom: 0,
+          borderRadius: 0,
         }}
         labelStyle={{
           textAlignVertical: 'center',
@@ -33,9 +39,19 @@ function CustomDrawerContent(props) {
         }}
       />
       <DrawerItemList
-        activeBackgroundColor={'lightgray'}
-        activeTintColor={'black'}
+        activeBackgroundColor={'#ededed'}
+        activeTintColor={'#181933'}
         labelStyle={{fontSize: 16}}
+        itemStyle={{
+          paddingLeft: 0,
+          paddingRight: 0,
+          marginLeft: 0,
+          marginRight: 0,
+          paddingTop: 0,
+          marginTop: 0,
+          paddingBottom: 0,
+          marginBottom: 0,
+        }}
         {...props}
       />
     </DrawerContentScrollView>
@@ -48,14 +64,51 @@ function Main() {
   return (
     <Drawer.Navigator
       drawerContent={props => <CustomDrawerContent {...props} />}>
-      <Drawer.Screen name="Farm Crops" component={HomePage} />
-      <Drawer.Screen name="Pest News" component={PestNews} />
       <Drawer.Screen
+        options={{
+          drawerIcon: config => (
+            <Icon style={{color: '#181933'}} size={20} name={'tree'} />
+          ),
+        }}
+        name="Farm Crops"
+        component={HomePage}
+      />
+      <Drawer.Screen
+        options={{
+          drawerIcon: config => (
+            <Icon style={{color: '#181933'}} size={20} name={'video-camera'} />
+          ),
+        }}
+        name="Videos"
+        component={Videos}
+      />
+      <Drawer.Screen
+        options={{
+          drawerIcon: config => (
+            <Icon style={{color: '#181933'}} size={20} name={'comment'} />
+          ),
+        }}
+        name="Feedback"
+        component={Feedback}
+      />
+      <Drawer.Screen
+        options={{
+          drawerIcon: config => (
+            <Icon style={{color: '#181933'}} size={23} name={'newspaper-o'} />
+          ),
+        }}
         name="Strawberries-Vegetables"
         component={StrawberriesVegetables}
       />
-      <Drawer.Screen name="Videos" component={Videos} />
-      <Drawer.Screen name="Feedback" component={Feedback} />
+      <Drawer.Screen
+        options={{
+          drawerIcon: config => (
+            <Icon style={{color: '#181933'}} size={23} name={'newspaper-o'} />
+          ),
+        }}
+        name="Pest News"
+        component={PestNews}
+      />
     </Drawer.Navigator>
   );
 }

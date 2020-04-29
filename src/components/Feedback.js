@@ -13,6 +13,8 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import {postFeedback} from '../store/actions/actions';
+import {connect} from 'react-redux';
 
 const REACTIONS = [
   {
@@ -50,13 +52,14 @@ const WIDTH = 380;
 const DISTANCE = WIDTH / REACTIONS.length;
 const END = WIDTH - DISTANCE;
 
-export default class Feedback extends React.Component {
+class Feedback extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       rating: '0',
       email: '',
       Comments: '',
+      isValid: false,
     };
     this._pan = new Animated.Value(2 * DISTANCE);
   }
@@ -97,31 +100,32 @@ export default class Feedback extends React.Component {
     this.setState({rating: reaction.rating});
   }
 
-  submitFeedback() {
-    this.setState({isLoaded: true});
-    const url = 'http://23.20.169.44/api/feedbacks';
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        rating: this.state.rating,
-        email: this.state.email,
-        comments: this.state.comments,
-      }),
-    })
-      .then(response => response.json())
-      .then(responsejson => {
-        // eslint-disable-next-line no-alert
-        alert('Feed back submitted successfully');
-        this.props.navigation.navigate('Farm Crops');
-      })
-      .catch(error => {});
-    this.setState({isLoaded: false});
-  }
+  submitFeedback = async () => {
+    const {email, comments, rating} = this.state;
+    const payload = {
+      email: email,
+      comments: comments,
+      rating: rating,
+    };
+    await postFeedback(payload);
+    this.props.navigation.navigate('Farm Crops');
+  };
 
+  validateFeedback = () => {
+    const {email, comments, rating} = this.state;
+    if (
+      email === '' ||
+      email === undefined ||
+      (comments === '' || comments === undefined) ||
+      rating === undefined
+    ) {
+      this.setState({
+        isValid: true,
+      });
+    } else {
+      this.submitFeedback();
+    }
+  };
   render() {
     const navigation = this.props.navigation;
     return (
@@ -155,6 +159,10 @@ export default class Feedback extends React.Component {
             onChangeText={email => this.setState({email})}
             value={this.state.email}
           />
+          {this.state.isValid &&
+          (this.state.email === '' || this.state.email === undefined) ? (
+            <Text style={{color: 'red'}}>Please enter the email</Text>
+          ) : null}
         </View>
         <View
           style={{
@@ -172,6 +180,10 @@ export default class Feedback extends React.Component {
             onChangeText={comments => this.setState({comments})}
             value={this.state.comments}
           />
+          {this.state.isValid &&
+          (this.state.comments === '' || this.state.comments === undefined) ? (
+            <Text style={{color: 'red'}}>Please enter the comments</Text>
+          ) : null}
         </View>
         <View style={styles.wrap}>
           <View style={styles.reactions}>
@@ -316,7 +328,7 @@ export default class Feedback extends React.Component {
             </View>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => this.submitFeedback()}
+            onPress={() => this.validateFeedback()}
             style={{
               borderLeftWidth: 0.3,
               borderLeftColor: 'gray',
@@ -396,3 +408,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Avenir',
   },
 });
+
+const mapStateToProps = state => ({
+  mainReducer: state,
+});
+
+const mapDispatchToProps = {};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Feedback);

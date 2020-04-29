@@ -12,6 +12,10 @@ import Main from './src/Navigations/Main';
 const store = createStore(rootReducer, applyMiddleware(thunk));
 const Stack = createStackNavigator();
 
+if (__DEV__) {
+  import('./ReactronConfig').then(() => console.log('Reactotron Configured'));
+}
+
 function Apps() {
   return (
     <NavigationContainer>

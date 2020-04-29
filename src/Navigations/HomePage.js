@@ -6,7 +6,7 @@ import MoreDetailsScreen from './MoreDetails';
 import Icon from '../../node_modules/react-native-vector-icons/FontAwesome';
 import Home from '../components/Home';
 import DiseaseDetails from '../components/DiseaseDetails';
-import Carousel from '../components/Carousel';
+import Carousel from '../components/ImagePreview';
 
 const Stack = createStackNavigator();
 

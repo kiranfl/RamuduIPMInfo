@@ -8,6 +8,8 @@ const initialState = {
   cropCategories: [],
   StrawberryVegNews: [],
   PestsNews: [],
+  diseasesList: [],
+  pestsList: [],
 };
 
 const reducer = (state = initialState, action) => {
@@ -47,42 +49,18 @@ const reducer = (state = initialState, action) => {
         isLoading: false,
         cropsList: action.payload,
       };
-    // case 'CROPS_LISTS':
-    //   return {
-    //     ...state,
-    //     cropsList: action.payload,
-    //   };
-    // case 'SELECTED_CROP':
-    //   return {
-    //     ...state,
-    //     selectedcropsList: action.payload,
-    //   };
-    // case 'CROPS_CATEGORIES':
-    //   return {
-    //     ...state,
-    //     cropCategories: action.payload,
-    //   };
-    // case 'CROPS_VIDEOS':
-    //   return {
-    //     ...state,
-    //     cropsVideos: action.payload,
-    //   };
-    // case 'STRAWBERRY_VEG_NEWS':
-    //   return {
-    //     ...state,
-    //     strawBerryVegNews: action.payload,
-    //   };
-    // case 'STRAWBERRY_VEG_NEWS':
-    //   return {
-    //     ...state,
-    //     strawBerryVegNews: action.payload,
-    //   };
-    // case 'PEST_NEWS':
-    //   return {
-    //     ...state,
-    //     pestNews: action.payload,
-    //   };
-
+    case ACTION_TYPES.GET_DISEASE_DETAILS_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+        diseasesList: action.payload,
+      };
+    case ACTION_TYPES.GET_PEST_DETAILS_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+        pestsList: action.payload,
+      };
     default:
       return state;
   }

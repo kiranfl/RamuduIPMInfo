@@ -1,6 +1,6 @@
 const URL = 'http://23.20.169.44/api';
-export const BASE_URL = `${URL}/en-us/`; //'http://23.20.169.44/api/en-us/';
-export const CROPS = `${BASE_URL}/crops`; // 'http://23.20.169.44/api/en-us/crops'
+export const BASE_URL = `${URL}/en-us`;
+export const CROPS = `${BASE_URL}/crops`;
 export const CATEGORIES = 'categories';
 export const POSTS = `${BASE_URL}/posts`;
 export const VIDEOS = `${URL}/menu/videos`;

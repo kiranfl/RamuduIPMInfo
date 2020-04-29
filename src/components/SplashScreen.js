@@ -24,11 +24,12 @@ class SplashScreen extends Component {
         toValue: 1,
         tension: 10,
         friction: 2,
+        useNativeDriver: true,
       }).start(),
       Animated.timing(LogoText, {
         toValue: 1,
         duration: 3000,
-        useNativeDriver: false,
+        useNativeDriver: true,
       }),
     ]).start(() => {
       this.setState({
@@ -38,15 +39,16 @@ class SplashScreen extends Component {
   }
 
   render() {
+    const spin = this.state.LogoAnime.interpolate({
+      inputRange: [0, 1],
+      outputRange: [1, 0],
+    });
     return (
       <View style={styles.container}>
         <Animated.View
           style={{
             opacity: this.state.LogoAnime,
-            top: this.state.LogoAnime.interpolate({
-              inputRange: [0, 1],
-              outputRange: [80, 0],
-            }),
+            transform: [{rotate: spin}],
           }}>
           <Image
             style={styles.logoImg}
