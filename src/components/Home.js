@@ -16,6 +16,8 @@ import {connect} from 'react-redux';
 import Carousel from 'react-native-snap-carousel';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import strawberry from '../assets/img/strawberry-icon.png';
+import lettuce from '../assets/img/lettuce.png';
 class Home extends React.Component {
   constructor() {
     super();
@@ -93,7 +95,7 @@ class Home extends React.Component {
           </Text>
           <Carousel
             ref={ref => (this.carousel = ref)}
-            firstItem={1}
+            firstItem={2}
             sliderWidth={wp('100%')}
             itemWidth={200}
             data={cropsList}
@@ -106,9 +108,21 @@ class Home extends React.Component {
           />
         </View>
         <View style={{flex: 1.5, alignItems: 'center', padding: 20}}>
-          <Text style={{marginTop: 5, fontSize: 24, padding: 5}}>
-            {this.state.originalName}
-          </Text>
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            <Icon
+              name="star"
+              size={20}
+              style={{
+                position: 'absolute',
+                top: 17,
+                left: -30,
+                color: 'gray',
+              }}
+            />
+            <Text style={{marginTop: 5, fontSize: 24, padding: 5}}>
+              {this.state.originalName}
+            </Text>
+          </View>
           <Text style={{textAlign: 'center', width: wp('90%')}}>
             {this.state.description}
           </Text>
@@ -125,6 +139,29 @@ class Home extends React.Component {
                   })
                 }>
                 <View>
+                  {this.state.name === 'Lettuce' ? (
+                    <Image
+                      style={{
+                        position: 'absolute',
+                        width: 30,
+                        height: 30,
+                        left: 10,
+                        top: hp('0%'),
+                      }}
+                      source={lettuce}
+                    />
+                  ) : (
+                    <Image
+                      style={{
+                        position: 'absolute',
+                        width: 30,
+                        height: 30,
+                        left: 10,
+                        top: hp('0%'),
+                      }}
+                      source={strawberry}
+                    />
+                  )}
                   <Text style={styles.moredetails}>More details</Text>
                 </View>
                 <View style={styles.icon}>
